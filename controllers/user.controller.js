@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+const JWT = require('jsonwebtoken')
+// const dotenv = require('dotenv')
 
+const JWTSecret = process.env.JWT_SECRET
 
 exports.postSignUp = async (req, res, next) => {
   const { User } = req.context.models;
@@ -8,9 +10,14 @@ exports.postSignUp = async (req, res, next) => {
     req.body.password = await bcrypt.hash(req.body.password, 10);
 
     const user = await User.create(req.body);
+    const token = await JWT.sign({ id: user._id }, JWTSecret)
+    res.send(data = {
+      user,
+      token
+    })
 
-    res.json(user);
   } catch (error) {
+    console.log(error)
     res.status(400).json({ error });
   }
 }
@@ -18,13 +25,17 @@ exports.postSignUp = async (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const { User } = req.context.models;
   try {
-    console.log(req.body)
 
     const { username, password } = req.body
     User.findOne({ username: username }, (err, user) => {
       bcrypt.compare(password, user.password).then((isMatching) => {
         if (isMatching) {
-          res.json(user);
+          const token = JWT.sign({ id: user._id }, JWTSecret)
+          console.log(token);
+          res.send(data = {
+            user,
+            token
+          })
         }
         else {
           res.status(400).json({ err });
@@ -33,6 +44,15 @@ exports.postLogin = (req, res, next) => {
     })
 
   } catch (error) {
+    res.status(400).json({ error });
+  }
+}
+
+exports.getLogout = (req, res, next) => {
+  try {
+    res.send({ success: true })
+  } catch (error) {
+    console.log(error)
     res.status(400).json({ error });
   }
 }
