@@ -1,6 +1,13 @@
 const passportLocalMongoose = require('passport-local-mongoose')
 const {Schema, model} = require("../db/connection") 
 
+const Session = new Schema({
+    refreshToken: {
+        type: String,
+        default: ''
+    }
+})
+
 const UserSchema = new Schema({
     username: {type: String, unique: true, required: true},
     email: {type: String, unique: true, required: true},
