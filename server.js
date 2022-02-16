@@ -8,7 +8,19 @@ const {createContext} = require("./controllers/middleware")
 
 const app = express()
 
-app.use(cors()) 
+const whitelist = process.env.WHITELIST_DOMAINS ? process.env.WHITELIST_DOMAINS.split(',') : []
+const corsOption = {
+    origin: (origin, callback) => {
+        if(!origin || whitelist.indexOf(origin) !== -1){
+            callback(null, true)
+        }else{
+            callback(null, true)
+        }
+    },
+    credentials: true
+}
+
+app.use(cors(corsOption)) 
 app.use(morgan("tiny"))
 app.use(express.json()) 
 app.use(createContext) 
