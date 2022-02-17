@@ -8,29 +8,28 @@ const { COOKIE_OPTIONS, getToken, getRefreshToken, verifyUser } = require('../au
 exports.postSignUp = async (req, res, next) => {
   const { User } = req.context.models;
   try {
-    // req.body.password = await bcrypt.hash(req.body.password, 10);
-    User.register( new User({ username: req.body.username}),
-    req.body.password,
-    (err, user)=> {
-      if(err){
-        // console.log(err)
-        res.status(500).send(err)
-      }else{
-        user.email = req.body.email
-        const token = getToken({_id: user._id})
-        const refreshToken = getRefreshToken({_id: user._id})
-        user.refreshToken.push({refreshToken})
-        user.save((err, user)=>{
-          if(err){
-            console.log(err)
-            res.status(500).send(err)
-          }else{
-            res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
-            res.send({sucess:true, token})
-          }
-        })
+    User.register(new User({ username: req.body.username }),
+      req.body.password,
+      (err, user) => {
+        if (err) {
+          // console.log(err)
+          res.status(500).send(err)
+        } else {
+          user.email = req.body.email
+          const token = getToken({ _id: user._id })
+          const refreshToken = getRefreshToken({ _id: user._id })
+          user.refreshToken.push({ refreshToken })
+          user.save((err, user) => {
+            if (err) {
+              console.log(err)
+              res.status(500).send(err)
+            } else {
+              res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
+              res.send({ sucess: true, token })
+            }
+          })
+        }
       }
-    }
     )
   } catch (error) {
     console.log(error)
@@ -41,25 +40,30 @@ exports.postSignUp = async (req, res, next) => {
 exports.postLogin = (req, res, next) => {
   const { User } = req.context.models;
   try {
+    const token = getToken({ _id: req.user._id })
+    const refreshToken = getRefreshToken({ _id: req.user._id })
+    console.log("hola")
+    console.log(req.body);
 
     const { username, password } = req.body
     User.findOne({ username: username }, (err, user) => {
-      bcrypt.compare(password, user.password).then((isMatching) => {
-        if (isMatching) {
-          const token = JWT.sign({ id: user._id }, JWTSecret)
-          console.log(token);
-          res.send(data = {
-            user,
-            token
-          })
-        }
-        else {
-          res.status(400).json({ err });
-        }
-      })
+      if (user) {
+        user.refreshToken.push({ refreshToken })
+        user.save((err, user) => {
+          if (err) {
+            res.status(500).send(err)
+          } else {
+            res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
+            res.send({ success: true, token })
+          }
+        })
+      }
+      else {
+        res.status(400).json({ err });
+      }
     })
-
   } catch (error) {
+    console.log(error)
     res.status(400).json({ error });
   }
 }

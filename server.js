@@ -6,6 +6,10 @@ const cors = require("cors")
 const userRoute = require("./routes/user.route") 
 const {createContext} = require("./controllers/middleware")
 const cookieParser = require('cookie-parser')
+const passport = require('passport')
+
+require('./strategies/LocalStrategy')
+require('./auth/authenticate')
 
 const app = express()
 
@@ -23,6 +27,7 @@ const corsOption = {
 }
 
 app.use(cors(corsOption)) 
+app.use(passport.initialize())
 app.use(morgan("tiny"))
 app.use(express.json()) 
 app.use(createContext) 
