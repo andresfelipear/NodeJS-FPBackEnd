@@ -7,3 +7,4 @@ passport.use(new LocalStrategy(User.authenticate()))
 
 //called while after login/signup, set user details to req.user
 passport.serializeUser(User.serializeUser())
+passport.deserializeUser(User.deserializeUser());
