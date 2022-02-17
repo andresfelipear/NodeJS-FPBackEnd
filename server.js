@@ -8,6 +8,7 @@ const {createContext} = require("./controllers/middleware")
 const cookieParser = require('cookie-parser')
 const passport = require('passport')
 
+require('./strategies/JwtStrategy')
 require('./strategies/LocalStrategy')
 require('./auth/authenticate')
 

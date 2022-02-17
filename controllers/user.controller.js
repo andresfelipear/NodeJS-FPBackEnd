@@ -1,8 +1,7 @@
-const bcrypt = require('bcryptjs')
-const JWT = require('jsonwebtoken')
-const passport = require('passport')
+const jwt = require('jsonwebtoken')
 
-const { COOKIE_OPTIONS, getToken, getRefreshToken, verifyUser } = require('../auth/authenticate')
+
+const { COOKIE_OPTIONS, getToken, getRefreshToken} = require('../auth/authenticate')
 
 
 exports.postSignUp = async (req, res, next) => {
@@ -42,8 +41,6 @@ exports.postLogin = (req, res, next) => {
   try {
     const token = getToken({ _id: req.user._id })
     const refreshToken = getRefreshToken({ _id: req.user._id })
-    console.log("hola")
-    console.log(req.body);
 
     const { username, password } = req.body
     User.findOne({ username: username }, (err, user) => {
@@ -68,11 +65,64 @@ exports.postLogin = (req, res, next) => {
   }
 }
 
+exports.getData = (req, res, next) => {
+  try {
+    res.send(req.user)
+
+  } catch (error) {
+    console.log(err)
+    res.status(401).json({ error })
+  }
+
+}
+
 exports.getLogout = (req, res, next) => {
   try {
     res.send({ success: true })
   } catch (error) {
     console.log(error)
     res.status(400).json({ error });
+  }
+}
+
+exports.postRefreshToken = (req, res, next) => {
+  const { signedCookies = {} } = req
+  const { refreshToken } = signedCookies
+  const { User } = req.context.models;
+
+  if (refreshToken) {
+    console.log("hola")
+    try {
+      const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+      const userId = payload._id
+      User.findOne({ _id: userId }).then(user => {
+        if (user) {
+          const tokenIndex = user.refreshToken.findIndex(item => item.refreshToken == refreshToken)
+
+          if (tokenIndex === -1) {
+            res.status(401).send("Unauthorized")
+          } else {
+            const token = getToken({ _id: userId })
+            const newRefreshToken = getRefreshToken({ _id: userId })
+            user.refreshToken[tokenIndex] = { refreshToken: newRefreshToken }
+            user.save((err, user) => {
+              if (err) {
+                res.status(500).send(err)
+              } else {
+                res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS)
+                res.send({ success: true, token })
+              }
+            })
+          }
+        }
+      })
+    } catch (err) {
+      console.log("hola11")
+      console.log(err)
+      res.status(401).send("Unauthorized")
+    }
+  } else {
+    console.log("hola22")
+    res.status(401).send("Unauthorized2")
   }
 }
