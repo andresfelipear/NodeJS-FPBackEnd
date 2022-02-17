@@ -13,7 +13,7 @@ router.post('/signup', userController.postSignUp)
 router.post('/login',  passport.authenticate("local"),userController.postLogin)
 
 //Get logout
-router.get('/logout', userController.getLogout)
+router.get('/logout',verifyUser, userController.getLogout)
 
 //get data
 router.get('/me',verifyUser, userController.getData)

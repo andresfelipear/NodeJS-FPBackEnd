@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 
-const { COOKIE_OPTIONS, getToken, getRefreshToken} = require('../auth/authenticate')
+const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 
 
 exports.postSignUp = async (req, res, next) => {
@@ -78,20 +78,41 @@ exports.getData = (req, res, next) => {
 
 exports.getLogout = (req, res, next) => {
   try {
-    res.send({ success: true })
-  } catch (error) {
-    console.log(error)
-    res.status(400).json({ error });
+    const { signedCookies = {} } = req
+    const { refreshToken } = signedCookies
+    const { User } = req.context.models
+
+    User.findById(req.user._id)
+      .then((user) => {
+        console.log("find user")
+        const tokenIndex = user.refreshToken.findIndex(item => item.refreshToken == refreshToken)
+        if (tokenIndex !== -1) {
+          user.refreshToken.id(user.refreshToken[tokenIndex]._id).remove()
+        }
+        user.save((err, user) => {
+          if (err) {
+            res.status(500).send(err)
+          } else {
+            res.clearCookie('refreshToken', COOKIE_OPTIONS)
+            res.send({ success: true })
+          }
+
+        })
+      })
   }
+  catch (error) {
+    console.log(error);
+    res.status(401).json({ error })
+  }
+
+
 }
 
 exports.postRefreshToken = (req, res, next) => {
   const { signedCookies = {} } = req
   const { refreshToken } = signedCookies
   const { User } = req.context.models;
-
   if (refreshToken) {
-    console.log("hola")
     try {
       const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
       const userId = payload._id
@@ -117,12 +138,13 @@ exports.postRefreshToken = (req, res, next) => {
         }
       })
     } catch (err) {
-      console.log("hola11")
       console.log(err)
       res.status(401).send("Unauthorized")
     }
   } else {
-    console.log("hola22")
-    res.status(401).send("Unauthorized2")
+    (err) => {
+      console.log(err)
+    }
+    res.status(401).send("Unauthorized")
   }
 }
