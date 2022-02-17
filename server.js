@@ -5,9 +5,11 @@ const {log} = require("mercedlogger")
 const cors = require("cors") 
 const userRoute = require("./routes/user.route") 
 const {createContext} = require("./controllers/middleware")
+const cookieParser = require('cookie-parser')
 
 const app = express()
 
+app.use(cookieParser(process.env.COOKIE_SECRET))
 const whitelist = process.env.WHITELIST_DOMAINS ? process.env.WHITELIST_DOMAINS.split(',') : []
 const corsOption = {
     origin: (origin, callback) => {

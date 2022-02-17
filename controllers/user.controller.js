@@ -13,14 +13,16 @@ exports.postSignUp = async (req, res, next) => {
     req.body.password,
     (err, user)=> {
       if(err){
+        // console.log(err)
         res.status(500).send(err)
       }else{
         user.email = req.body.email
         const token = getToken({_id: user._id})
-        const refreshToken = getRefreshToken1({_id: user._id})
+        const refreshToken = getRefreshToken({_id: user._id})
         user.refreshToken.push({refreshToken})
         user.save((err, user)=>{
           if(err){
+            console.log(err)
             res.status(500).send(err)
           }else{
             res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
