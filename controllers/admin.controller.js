@@ -26,7 +26,7 @@ exports.postAddPost = (req, res, next) => {
                 console.log(err)
                 res.status(500).send(err)
             } else {
-                res.send({ sucess: true})
+                res.send({ sucess: true })
             }
         })
 
@@ -53,9 +53,19 @@ exports.postEditPost = async (req, res, next) => {
 
 //Delete Post (post)
 exports.postDeletePost = async (req, res, next) => {
-    const { postId } = req.body
-    await Posts.findByIdAndDelete(postId)
-    res.redirect('/')
+    try {
+        const { postId } = req.body
+        await Posts.findByIdAndDelete(postId).catch(err => {
+            console.log(error)
+            res.status(400).json({ error });
+        })
+        res.send({ sucess: true })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error });
+    }
+
 }
 
 // //Like Post

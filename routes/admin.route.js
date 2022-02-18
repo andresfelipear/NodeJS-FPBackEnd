@@ -8,5 +8,9 @@ const {verifyUser} = require('../auth/authenticate')
 
 router.post('/add-post',verifyUser,adminController.postAddPost )
 
+//Post deletePost
+
+router.post('/deletePost', verifyUser, adminController.postDeletePost)
+
 module.exports = router
     
