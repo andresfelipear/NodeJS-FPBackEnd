@@ -58,16 +58,24 @@ exports.postAddPost = (req, res, next) => {
 
 //Edit Post (post)
 exports.postEditPost = async (req, res, next) => {
-    const { title, imageUrl, description, postId } = req.body
-    const post = await getById(postId)
+    try {
+        const { title, imageUrl, description, postId } = req.body
+        const post = await getById(postId)
 
-    post.title = title
-    post.imageUrl = imageUrl
-    post.description = description
-    post.date = new Date()
+        post.title = title
+        post.imageUrl = imageUrl
+        post.description = description
+        post.date = new Date()
 
-    await post.save()
-    res.redirect('/')
+        await post.save()
+        res.send({success:true})
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error })
+    }
+
+
 }
 
 //Delete Post (post)
