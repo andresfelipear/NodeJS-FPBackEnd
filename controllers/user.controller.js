@@ -81,11 +81,7 @@ exports.getLogout = (req, res, next) => {
 
     const { User } = req.context.models
     const { signedCookies = {} } = req
-    console.log(signedCookies)
     const {refreshToken} = signedCookies;
-    // const token = req.headers.authorization.replace("Bearer ","")
-    // const refreshToken2  = refreshToken!=undefined?refreshToken:token; 
-    // console.log(refreshToken2)
 
     User.findById(req.user._id)
       .then((user) => {
