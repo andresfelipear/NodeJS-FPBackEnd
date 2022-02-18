@@ -8,6 +8,25 @@ const getById = (postId) => {
     }).clone()
 }
 
+//Edit Post (get)
+exports.getPost = async (req, res, next) => {
+    try {
+        const { postId } = req.params
+        const post = await getById(postId).catch(err => {
+            console.log(err)
+            res.status(404).send(err)
+        })
+        res.send({ sucess: true, post })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error });
+    }
+
+
+
+}
+
 
 //Add Post (post)
 exports.postAddPost = (req, res, next) => {
@@ -53,10 +72,9 @@ exports.postEditPost = async (req, res, next) => {
 
 //Delete Post (post)
 exports.postDeletePost = async (req, res, next) => {
-    console.log("hola")
     try {
         const { postId } = req.body
-        
+
         await Posts.findByIdAndDelete(postId).catch(err => {
             console.log(error)
             res.status(400).json({ error });
@@ -64,7 +82,6 @@ exports.postDeletePost = async (req, res, next) => {
         res.send({ sucess: true })
 
     } catch (error) {
-        console.log("hola")
         console.log(error)
         res.status(400).json({ error });
     }

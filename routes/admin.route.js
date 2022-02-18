@@ -12,5 +12,9 @@ router.post('/add-post',verifyUser,adminController.postAddPost )
 
 router.post('/deletePost', verifyUser, adminController.postDeletePost)
 
+//Get post
+
+router.get('/getPost/:postId', verifyUser, adminController.getPost)
+
 module.exports = router
     
