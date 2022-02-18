@@ -8,20 +8,6 @@ const getById = (postId) => {
     }).clone()
 }
 
-exports.getAllPosts = (req, res, next) => {
-    Posts.find((err, posts) => {
-        if (err) console.log(err);
-        res.render('admin/posts', {
-            titlePage: `Posts - (${req.session.user.username})`,
-            session: req.session.hasOwnProperty('user') ? req.session : false,
-            errMsg: '',
-            posts: posts
-        })
-    })
-
-
-}
-
 
 //Add Post (post)
 exports.postAddPost = (req, res, next) => {

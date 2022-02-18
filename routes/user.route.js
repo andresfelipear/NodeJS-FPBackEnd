@@ -21,5 +21,9 @@ router.get('/me',verifyUser, userController.getData)
 
 //refresh Token
 router.post('/refreshToken', userController.postRefreshToken)
+
+//getPosts
+router.get('/getPosts', userController.getPosts)
+
 module.exports = router
     

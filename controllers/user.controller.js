@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 
 
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
+const Posts = require('../models/posts.model')
+
 
 
 exports.postSignUp = async (req, res, next) => {
@@ -81,7 +83,7 @@ exports.getLogout = (req, res, next) => {
 
     const { User } = req.context.models
     const { signedCookies = {} } = req
-    const {refreshToken} = signedCookies;
+    const { refreshToken } = signedCookies;
 
     User.findById(req.user._id)
       .then((user) => {
@@ -147,4 +149,24 @@ exports.postRefreshToken = (req, res, next) => {
     }
     res.status(401).send("Unauthorized")
   }
+}
+
+//get Posts
+exports.getPosts = (req, res, next) => {
+  try {
+    Posts.find((err, posts) => {
+      if(err) {
+        res.status(400).json({ err });
+      }else{
+        res.send({ success: true, posts })
+      }
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ error })
+  }
+  
+
+
 }
