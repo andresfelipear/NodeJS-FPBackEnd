@@ -19,9 +19,12 @@ const UserSchema = new Schema({
     refreshToken: {
         type: [Session]
     },
-    points: {
-        type: Number,
-        defautl:50
+    posts: {
+        postId: { 
+            type: Schema.Types.ObjectId,
+            required: false,
+            ref: 'Posts'
+        },
     }
 })
 
