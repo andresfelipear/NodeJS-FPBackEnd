@@ -53,8 +53,10 @@ exports.postEditPost = async (req, res, next) => {
 
 //Delete Post (post)
 exports.postDeletePost = async (req, res, next) => {
+    console.log("hola")
     try {
         const { postId } = req.body
+        
         await Posts.findByIdAndDelete(postId).catch(err => {
             console.log(error)
             res.status(400).json({ error });
@@ -62,6 +64,7 @@ exports.postDeletePost = async (req, res, next) => {
         res.send({ sucess: true })
 
     } catch (error) {
+        console.log("hola")
         console.log(error)
         res.status(400).json({ error });
     }
