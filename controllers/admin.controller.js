@@ -68,7 +68,7 @@ exports.postEditPost = async (req, res, next) => {
         post.date = new Date()
 
         await post.save()
-        res.send({success:true})
+        res.send({ success: true })
 
     } catch (error) {
         console.log(error)
@@ -96,17 +96,22 @@ exports.postDeletePost = async (req, res, next) => {
 
 }
 
-// //Like Post
-// exports.postLikePost = async(req, res, next)=>{
-//     const { postId} = req.body
-//     const post = await getById(postId)
+//Like Post
+exports.postLikePost = async (req, res, next) => {
+    try {
+        const { postId } = req.body
+        const post = await getById(postId)
 
-//     post.likes = post.likes+1
-//     await post.save()
+        post.likes = post.likes + 1
+        await post.save()
+        res.send({success:true})
 
-//     res.redirect('/')
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({ error })
+    }
 
-// }
+}
 
 // //Add comment Post
 // exports.postAddComentPost = async(req, res, next)=>{

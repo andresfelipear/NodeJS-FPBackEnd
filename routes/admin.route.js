@@ -19,5 +19,8 @@ router.get('/getPost/:postId', verifyUser, adminController.getPost)
 //Edit post
 router.post('/edit-post', verifyUser, adminController.postEditPost)
 
+//like post
+router.post('/like-post',verifyUser, adminController.postLikePost)
+
 module.exports = router
     
