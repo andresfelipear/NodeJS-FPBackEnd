@@ -183,7 +183,7 @@ exports.getComments = (req, res, next) => {
       if (comments) {
         res.send({ success: true, comments })     
       } else {
-        console.log("not found")
+        console.log("Not Found")
         console.log(err)
         res.status(404).json({ err });
       }
@@ -194,4 +194,18 @@ exports.getComments = (req, res, next) => {
     res.status(401).json({ error })
   }
 
+}
+
+//get postComments
+exports.getPostComments = async(req, res, next)=>{
+  try{
+    const {postId} = req.params
+    const comments = await Comments.find({postId:postId})
+    const post = await Posts.findById(postId)
+    res.send({success:true, comments, post})
+    
+  }catch(error){
+    console.log(error)
+    res.status(401).json({error})
+  }
 }

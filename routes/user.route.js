@@ -32,5 +32,8 @@ router.get('/getPost/:postId', adminController.getPost)
 //get comments
 router.get('/getComments/:postId', userController.getComments)
 
+//get post and comments
+router.get('/getPostComments/:postId', userController.getPostComments)
+
 module.exports = router
     
