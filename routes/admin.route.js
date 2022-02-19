@@ -22,5 +22,8 @@ router.post('/edit-post', verifyUser, adminController.postEditPost)
 //like post
 router.post('/like-post',verifyUser, adminController.postLikePost)
 
+//router
+router.post('/add-comment', verifyUser, adminController.postAddComment)
+
 module.exports = router
     

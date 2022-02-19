@@ -1,5 +1,5 @@
 const Posts = require('../models/posts.model')
-
+const Comments = require('../models/comments.model')
 
 const getById = (postId) => {
     return Posts.findById(postId, (err, post) => {
@@ -101,7 +101,7 @@ exports.postLikePost = async (req, res, next) => {
 
         post.likes = post.likes + 1
         await post.save()
-        res.send({success:true})
+        res.send({ success: true })
 
     } catch (error) {
         console.log(error)
@@ -110,14 +110,26 @@ exports.postLikePost = async (req, res, next) => {
 
 }
 
-// //Add comment Post
-// exports.postAddComentPost = async(req, res, next)=>{
-//     const {postId, comment} = req.body
-//     const post = await getById(postId)
-//     post.comments.push({
-//         comment:comment,
-//         date: new Date()
-//     })
-//     await post.save()
-//     res.redirect('/')
-// }
+//Add comment Post
+exports.postAddComment = async (req, res, next) => {
+    try {
+        const { postId, comment } = req.body
+        const comments = new Comments({
+            comment: comment,
+            date: new Date(),
+            postId: postId
+        })
+        res.send({status:true})
+        await comments.save().catch(err => {
+            console.log(error);
+            res.status(400).json({ error })
+        })
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({ error })
+    }
+
+
+
+}
