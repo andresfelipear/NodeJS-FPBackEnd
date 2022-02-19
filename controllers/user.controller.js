@@ -3,8 +3,14 @@ const jwt = require('jsonwebtoken')
 
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 const Posts = require('../models/posts.model')
+const Comments = require('../models/comments.model')
 
-
+const getById = (postId) => {
+  return Posts.findById(postId, (err, post) => {
+    if (err) console.log(err)
+    return post
+  }).clone()
+}
 
 exports.postSignUp = async (req, res, next) => {
   const { User } = req.context.models;
@@ -155,9 +161,9 @@ exports.postRefreshToken = (req, res, next) => {
 exports.getPosts = (req, res, next) => {
   try {
     Posts.find((err, posts) => {
-      if(err) {
+      if (err) {
         res.status(400).json({ err });
-      }else{
+      } else {
         res.send({ success: true, posts })
       }
     })
@@ -166,7 +172,26 @@ exports.getPosts = (req, res, next) => {
     console.log(error);
     res.status(401).json({ error })
   }
-  
 
+}
+
+//get Comments
+exports.getComments = (req, res, next) => {
+  try {
+    const {postId} = req.params
+    Comments.find({postId:postId},(err, comments) => {
+      if (comments) {
+        res.send({ success: true, comments })     
+      } else {
+        console.log("not found")
+        console.log(err)
+        res.status(404).json({ err });
+      }
+    })
+
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ error })
+  }
 
 }

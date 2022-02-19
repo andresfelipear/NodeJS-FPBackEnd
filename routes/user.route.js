@@ -3,6 +3,7 @@ const router = Router()
 const passport = require('passport')
 
 const userController = require('../controllers/user.controller')
+const adminController = require('../controllers/admin.controller')
 const {verifyUser} = require('../auth/authenticate')
 
 //Post Sign Up
@@ -24,6 +25,12 @@ router.post('/refreshToken', userController.postRefreshToken)
 
 //getPosts
 router.get('/getPosts', userController.getPosts)
+
+//get post
+router.get('/getPost/:postId', adminController.getPost)
+
+//get comments
+router.get('/getComments/:postId', userController.getComments)
 
 module.exports = router
     
