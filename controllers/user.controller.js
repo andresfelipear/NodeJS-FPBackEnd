@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const sendEmail = require('../utils/email/sendEmail')
 
 
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
@@ -33,6 +34,13 @@ exports.postSignUp = async (req, res, next) => {
               res.status(500).send(err)
             } else {
               res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
+              const email = sendEmail(
+                user.email,
+                "Welcome Travel Blog",
+                { username: user.username, email: user.email},
+                "./template/welcomeUser.handlebars"
+              )
+              console.log("email")
               res.send({ sucess: true, token })
             }
           })
@@ -179,10 +187,10 @@ exports.getPosts = (req, res, next) => {
 //get Comments
 exports.getComments = (req, res, next) => {
   try {
-    const {postId} = req.params
-    Comments.find({postId:postId},(err, comments) => {
+    const { postId } = req.params
+    Comments.find({ postId: postId }, (err, comments) => {
       if (comments) {
-        res.send({ success: true, comments })     
+        res.send({ success: true, comments })
       } else {
         console.log("Not Found")
         console.log(err)
@@ -198,15 +206,15 @@ exports.getComments = (req, res, next) => {
 }
 
 //get postComments
-exports.getPostComments = async(req, res, next)=>{
-  try{
-    const {postId} = req.params
-    const comments = await Comments.find({postId:postId})
+exports.getPostComments = async (req, res, next) => {
+  try {
+    const { postId } = req.params
+    const comments = await Comments.find({ postId: postId })
     const post = await Posts.findById(postId)
-    res.send({success:true, comments, post})
-    
-  }catch(error){
+    res.send({ success: true, comments, post })
+
+  } catch (error) {
     console.log(error)
-    res.status(401).json({error})
+    res.status(401).json({ error })
   }
 }

@@ -9,6 +9,7 @@ const sendEmail = async (email, subject, payload, template) => {
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
+    secure:true,
     auth: {
       user: process.env.EMAIL_USERNAME,
       pass: process.env.EMAIL_PASSWORD,
@@ -28,8 +29,10 @@ const sendEmail = async (email, subject, payload, template) => {
 
   transporter.sendMail(options(), (error, info) => {
       if(error){
+          console.log(error)
           return error
       } else{
+          console.log("success")
           return res.status(200).json({ success: true })
       }
   });
