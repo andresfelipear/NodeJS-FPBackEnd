@@ -11,6 +11,7 @@ const Session = new Schema({
 const UserSchema = new Schema({
     username: {type: String, unique: true, required: true},
     email: {type: String, unique: true},
+    icon: {type: String},
     password: {type: String},
     authStrategy: {
         type:String,

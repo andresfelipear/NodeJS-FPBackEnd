@@ -23,6 +23,7 @@ exports.postSignUp = async (req, res, next) => {
           res.status(500).send(err)
         } else {
           user.email = req.body.email
+          user.icon = req.body.icon
           const token = getToken({ _id: user._id })
           const refreshToken = getRefreshToken({ _id: user._id })
           user.refreshToken.push({ refreshToken })
