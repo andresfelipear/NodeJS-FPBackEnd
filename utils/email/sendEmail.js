@@ -24,6 +24,11 @@ const sendEmail = async (email, subject, payload, template) => {
       to: email,
       subject,
       html: compiledTemplate(payload),
+      attachments:[{
+        filename:'blog-solid.svg',
+        path:__dirname + "/template/blog-solid.svg",
+        cid: 'logo'
+      }]
     };
   };
 
