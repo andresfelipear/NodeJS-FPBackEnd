@@ -9,6 +9,7 @@ const Token = require('../models/token.models')
 
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const clientURL = process.env.CLIENT_URL
 
 const getById = (postId) => {
   return Posts.findById(postId, (err, post) => {
@@ -103,7 +104,7 @@ exports.postForgot = (req, res, next) => {
             token: hash,
             createdAt: Date.now()
           }).save()
-          const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`
+          const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`
           sendEmail
           (
             user.email,
@@ -113,17 +114,14 @@ exports.postForgot = (req, res, next) => {
           )
           res.send({ sucess: true })
         } catch (error) {
-          console.log(error)
           res.status(400).json({ error });
         }
       }
       else {
-        console.log(err)
         res.status(400).json({ err });
       }
     })
   } catch (error) {
-    console.log(error)
     res.status(400).json({ error });
   }
 }
