@@ -82,6 +82,30 @@ exports.postLogin = (req, res, next) => {
   }
 }
 
+exports.postForgot = (req, res, next) => {
+  const { User } = req.context.models;
+  try {
+    const { username} = req.body
+    User.findOne({ username: username }, (err, user) => {
+      if (user) {
+        user.save((err, user) => {
+          if (err) {
+            res.status(500).send(err)
+          } else {
+            res.send({ success: true})
+          }
+        })
+      }
+      else {
+        res.status(400).json({ err });
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({ error });
+  }
+}
+
 exports.getData = (req, res, next) => {
   try {
     res.send(req.user)

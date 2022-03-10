@@ -13,6 +13,9 @@ router.post('/signup', userController.postSignUp)
 //Post Login
 router.post('/login',  passport.authenticate("local"),userController.postLogin)
 
+//Post reset Password
+router.post('/forgot',  passport.authenticate("local"),userController.postForgot)
+
 //Get logout
 router.get('/logout',verifyUser, userController.getLogout)
 
