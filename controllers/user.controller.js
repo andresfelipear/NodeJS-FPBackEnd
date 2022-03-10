@@ -5,6 +5,8 @@ const sendEmail = require('../utils/email/sendEmail')
 const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authenticate')
 const Posts = require('../models/posts.model')
 const Comments = require('../models/comments.model')
+const Token = require('../models/token.models')
+const crypto = require('crypto')
 
 const getById = (postId) => {
   return Posts.findById(postId, (err, post) => {
@@ -37,7 +39,7 @@ exports.postSignUp = async (req, res, next) => {
               const email = sendEmail(
                 user.email,
                 "Welcome Travel Blog",
-                { username: user.username, email: user.email},
+                { username: user.username, email: user.email },
                 "./template/welcomeUser.handlebars"
               )
               console.log("email")
@@ -85,16 +87,29 @@ exports.postLogin = (req, res, next) => {
 exports.postForgot = (req, res, next) => {
   const { User } = req.context.models;
   try {
-    const { username} = req.body
+    const { username } = req.body
     User.findOne({ username: username }, (err, user) => {
       if (user) {
-        user.save((err, user) => {
-          if (err) {
-            res.status(500).send(err)
-          } else {
-            res.send({ success: true})
-          }
-        })
+        const token = await Token.findOne({ userId: user._id })
+        if (token) await token.deleteOne()
+        const resetToken = crypto.randomBytes(32).toString("hex")
+        const hash = await bcrypt.hash(resetToken, bcryptSalt)
+
+        await new Token({
+          userId: user._id,
+          token: hash,
+          createdAt: Date.now()
+        }).save()
+
+        const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`
+
+        sendEmail(
+          user.email,
+          "Password Reset Request",
+          { username: user.username, link },
+          "./template/requestResetPassword.handlebars"
+        )
+        res.send({sucess:true})
       }
       else {
         res.status(400).json({ err });
