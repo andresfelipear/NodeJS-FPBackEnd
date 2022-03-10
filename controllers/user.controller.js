@@ -6,6 +6,8 @@ const { COOKIE_OPTIONS, getToken, getRefreshToken } = require('../auth/authentic
 const Posts = require('../models/posts.model')
 const Comments = require('../models/comments.model')
 const Token = require('../models/token.models')
+
+const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 
 const getById = (postId) => {
@@ -85,33 +87,38 @@ exports.postLogin = (req, res, next) => {
 }
 
 exports.postForgot = (req, res, next) => {
+  const bcryptSalt = 10;
   const { User } = req.context.models;
   try {
     const { username } = req.body
-    User.findOne({ username: username }, (err, user) => {
+    User.findOne({ username: username }, async (err, user) => {
       if (user) {
         const token = await Token.findOne({ userId: user._id })
         if (token) await token.deleteOne()
-        const resetToken = crypto.randomBytes(32).toString("hex")
-        const hash = await bcrypt.hash(resetToken, bcryptSalt)
-
-        await new Token({
-          userId: user._id,
-          token: hash,
-          createdAt: Date.now()
-        }).save()
-
-        const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`
-
-        sendEmail(
-          user.email,
-          "Password Reset Request",
-          { username: user.username, link },
-          "./template/requestResetPassword.handlebars"
-        )
-        res.send({sucess:true})
+        const resetToken = crypto.randomBytes(32).toString("hex")     
+        try {
+          const hash = await bcrypt.hash(resetToken, bcryptSalt)
+          await new Token({
+            userId: user._id,
+            token: hash,
+            createdAt: Date.now()
+          }).save()
+          const link = `${process.env.CLIENT_URL}/passwordReset?token=${resetToken}&id=${user._id}`
+          sendEmail
+          (
+            user.email,
+            "Password Reset Request",
+            { username: user.username, link },
+            "./template/requestResetPassword.handlebars"
+          )
+          res.send({ sucess: true })
+        } catch (error) {
+          console.log(error)
+          res.status(400).json({ error });
+        }
       }
       else {
+        console.log(err)
         res.status(400).json({ err });
       }
     })
