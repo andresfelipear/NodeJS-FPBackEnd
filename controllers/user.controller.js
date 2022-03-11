@@ -25,7 +25,6 @@ exports.postSignUp = async (req, res, next) => {
       req.body.password,
       (err, user) => {
         if (err) {
-          // console.log(err)
           res.status(500).send(err)
         } else {
           user.email = req.body.email
@@ -35,7 +34,6 @@ exports.postSignUp = async (req, res, next) => {
           user.refreshToken.push({ refreshToken })
           user.save((err, user) => {
             if (err) {
-              console.log(err)
               res.status(500).send(err)
             } else {
               res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS)
@@ -45,7 +43,6 @@ exports.postSignUp = async (req, res, next) => {
                 { username: user.username, email: user.email },
                 "./template/welcomeUser.handlebars"
               )
-              console.log("email")
               res.send({ sucess: true, token })
             }
           })
@@ -53,7 +50,6 @@ exports.postSignUp = async (req, res, next) => {
       }
     )
   } catch (error) {
-    console.log(error)
     res.status(400).json({ error });
   }
 }
