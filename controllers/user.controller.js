@@ -9,6 +9,7 @@ const Token = require('../models/token.models')
 
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
+const { log } = require('console')
 const clientURL = process.env.CLIENT_URL
 
 const getById = (postId) => {
@@ -92,7 +93,7 @@ exports.postForgot = (req, res, next) => {
       if (user) {
         const token = await Token.findOne({ userId: user._id })
         if (token) await token.deleteOne()
-        const resetToken = crypto.randomBytes(32).toString("hex")     
+        const resetToken = crypto.randomBytes(32).toString("hex")
         try {
           const hash = await bcrypt.hash(resetToken, bcryptSalt)
           await new Token({
@@ -102,12 +103,12 @@ exports.postForgot = (req, res, next) => {
           }).save()
           const link = `${clientURL}/passwordReset?token=${resetToken}&id=${user._id}`
           sendEmail
-          (
-            user.email,
-            "Password Reset Request",
-            { username: user.username, link },
-            "./template/requestResetPassword.handlebars"
-          )
+            (
+              user.email,
+              "Password Reset Request",
+              { username: user.username, link },
+              "./template/requestResetPassword.handlebars"
+            )
           res.send({ sucess: true })
         } catch (error) {
           res.status(400).json({ error });
@@ -120,6 +121,51 @@ exports.postForgot = (req, res, next) => {
   } catch (error) {
     res.status(400).json({ error });
   }
+}
+
+exports.postResetPassword = async (req, res, next) => {
+  const { User } = req.context.models;
+  const { password, userId, token } = req.body;
+  Token.findOne({ userId: userId }, async (error, resetToken) => {
+    if (resetToken) {
+      const isValid = await bcrypt.compare(token, resetToken.token)
+      if (!isValid) {
+        console.log("is invalid")
+        res.status(400).json({ err });
+      } else {
+        User.findOne({ _id:userId }, async (err, user) => {
+          if (user) {
+            console.log(user)
+            await user.setPassword(password);
+            await user.save()
+            sendEmail
+              (
+                user.email,
+                "Password Reset Successfully",
+                { username: user.username },
+                "./template/resetPassword.handlebars"
+              )
+            res.send({ sucess: true })
+
+          } else {
+            console.log(err)
+            console.log("error 3")
+            res.status(400).json({ err });
+          }
+
+        })
+
+
+      }
+    } else {
+      console.log("error");
+      console.log(error)
+      res.status(400).json({ error });
+    }
+  })
+
+
+
 }
 
 exports.getData = (req, res, next) => {

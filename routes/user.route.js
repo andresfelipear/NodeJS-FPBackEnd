@@ -13,8 +13,11 @@ router.post('/signup', userController.postSignUp)
 //Post Login
 router.post('/login',  passport.authenticate("local"),userController.postLogin)
 
-//Post reset Password
+//Post reset Password Link
 router.post('/forgot',userController.postForgot)
+
+//Post reset password form
+router.post('/resetPassword', userController.postResetPassword)
 
 //Get logout
 router.get('/logout',verifyUser, userController.getLogout)
