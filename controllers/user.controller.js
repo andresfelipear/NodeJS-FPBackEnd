@@ -130,12 +130,10 @@ exports.postResetPassword = async (req, res, next) => {
     if (resetToken) {
       const isValid = await bcrypt.compare(token, resetToken.token)
       if (!isValid) {
-        console.log("is invalid")
         res.status(400).json({ err });
       } else {
         User.findOne({ _id:userId }, async (err, user) => {
           if (user) {
-            console.log(user)
             await user.setPassword(password);
             await user.save()
             sendEmail
@@ -148,8 +146,6 @@ exports.postResetPassword = async (req, res, next) => {
             res.send({ sucess: true })
 
           } else {
-            console.log(err)
-            console.log("error 3")
             res.status(400).json({ err });
           }
 
@@ -158,8 +154,6 @@ exports.postResetPassword = async (req, res, next) => {
 
       }
     } else {
-      console.log("error");
-      console.log(error)
       res.status(400).json({ error });
     }
   })
