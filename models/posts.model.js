@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Comments = require('../models/comments.model')
 const Schema = mongoose.Schema
 
 const productSchema = new Schema({
@@ -38,6 +39,10 @@ const productSchema = new Schema({
         type: String,
         required: true
     }
+})
+
+productSchema.pre("remove", async()=>{
+    await Comments.remove({postId:this._id})
 })
 
 module.exports = mongoose.model('Posts', productSchema)
