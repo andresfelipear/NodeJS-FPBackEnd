@@ -79,7 +79,6 @@ exports.postEditPost = async (req, res, next) => {
 exports.postDeletePost = async (req, res, next) => {
     try {
         const { postId } = req.body
-
         await Posts.findByIdAndDelete(postId).catch(err => {
             console.log(error)
             res.status(400).json({ error });
